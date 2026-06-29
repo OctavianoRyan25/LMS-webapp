@@ -10,7 +10,14 @@ final class LessonFile extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['lesson_id', 'file_type', 'file_path', 'file_url', 'file_name', 'file_size', 'cloudinary_public_id'];
+    protected $fillable = [
+        'lesson_id',
+        'file_type',
+        'file_name',
+        'file_url',
+        'cloudinary_public_id',
+        'file_size',
+    ];
 
     public function lesson(): BelongsTo
     {

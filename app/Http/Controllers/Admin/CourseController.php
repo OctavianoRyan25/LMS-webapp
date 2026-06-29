@@ -78,7 +78,7 @@ final class CourseController extends Controller
 
     public function show(Course $course): View
     {
-        $course->load(['creator', 'chapters.lessons']);
+        $course->load(['creator', 'lessons.files', 'exams.submissions']);
 
         return view('page.courses.show', [
             'activeNav' => 'courses',

@@ -11,21 +11,24 @@ final class Lesson extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['chapter_id', 'prev_lesson_id', 'next_lesson_id', 'title', 'content', 'order'];
+    protected $fillable = [
+        'course_id',
+        'title',
+        'content',
+        'video_url',
+        'video_public_id',
+        'order',
+        'duration_minutes',
+        'is_free_preview',
+    ];
 
-    public function chapter(): BelongsTo
-    {
-        return $this->belongsTo(Chapter::class);
-    }
+    protected $casts = [
+        'is_free_preview' => 'boolean',
+    ];
 
-    public function prevLesson(): BelongsTo
+    public function course(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class, 'prev_lesson_id');
-    }
-
-    public function nextLesson(): BelongsTo
-    {
-        return $this->belongsTo(Lesson::class, 'next_lesson_id');
+        return $this->belongsTo(Course::class);
     }
 
     public function files(): HasMany

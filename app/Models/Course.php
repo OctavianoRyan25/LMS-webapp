@@ -27,7 +27,7 @@ final class Course extends Model
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price'           => 'decimal:2',
         'has_certificate' => 'boolean',
     ];
 
@@ -36,9 +36,9 @@ final class Course extends Model
         return $this->belongsTo(User::class, 'creator_id');
     }
 
-    public function chapters(): HasMany
+    public function lessons(): HasMany
     {
-        return $this->hasMany(Chapter::class);
+        return $this->hasMany(Lesson::class)->orderBy('order');
     }
 
     public function exams(): HasMany

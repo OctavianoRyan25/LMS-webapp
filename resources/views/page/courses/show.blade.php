@@ -140,41 +140,182 @@
                 </div>
             </div>
 
-            {{-- Card: Chapters --}}
+            {{-- Card: Lessons --}}
             <div class="ep-card">
                 <div class="ep-card-header">
                     <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                        Chapters ({{ $course->chapters->count() }})
+                        Lessons ({{ $course->lessons->count() }})
                     </h3>
-                    <a href="#" class="ep-btn-outline ep-btn-sm">
+                    <a href="{{ route('admin.courses.lessons.create', $course) }}" class="ep-btn-outline ep-btn-sm">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        Tambah Chapter
+                        Tambah Lesson
                     </a>
                 </div>
-                <div class="ep-card-body">
-                    @forelse($course->chapters as $chapter)
-                        <div
-                            class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-navy-800/40 transition-colors">
+                <div class="ep-card-body divide-y divide-slate-100 dark:divide-navy-700">
+                    @forelse($course->lessons as $lesson)
+                        <div class="flex items-center gap-3 py-3 group">
+                            {{-- Nomor urut --}}
                             <div
                                 class="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-500/10 flex items-center justify-center flex-shrink-0">
                                 <span class="text-xs font-semibold text-brand-600 dark:text-brand-400">
-                                    {{ $chapter->order }}
+                                    {{ $lesson->order }}
                                 </span>
                             </div>
-                            <div class="flex-1">
-                                <p class="font-medium text-slate-800 dark:text-slate-100">
-                                    {{ $chapter->title }}
+
+                            {{-- Info --}}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
+                                    {{ $lesson->title }}
                                 </p>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    @if ($lesson->duration_minutes)
+                                        <span class="text-xs text-slate-400">{{ $lesson->duration_minutes }} menit</span>
+                                    @endif
+                                    @if ($lesson->is_free_preview)
+                                        <x-badge color="blue" size="sm">Free Preview</x-badge>
+                                    @endif
+                                    @if ($lesson->video_url)
+                                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12.553 1.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                            </svg>
+                                            Video
+                                        </span>
+                                    @endif
+                                    @if ($lesson->files->count() > 0)
+                                        <span class="text-xs text-slate-400 flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                class="lucide lucide-paperclip-icon lucide-paperclip">
+                                                <path
+                                                    d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551" />
+                                            </svg>
+                                            {{ $lesson->files->count() }} lampiran
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            {{-- Aksi --}}
+                            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ route('admin.lessons.edit', $lesson) }}"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors"
+                                    title="Edit Lesson">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <button type="button"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                    onclick="EP.deleteForm(this, 'Lesson ini beserta video dan lampirannya akan dihapus permanen.')"
+                                    data-form-id="delete-lesson-{{ $lesson->id }}" title="Hapus Lesson">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-10">
+                            <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <p class="text-sm text-slate-400">Belum ada lesson</p>
+                            <a href="{{ route('admin.courses.lessons.create', $course) }}"
+                                class="ep-btn-outline ep-btn-sm mt-3 inline-flex">
+                                + Tambah Lesson Pertama
+                            </a>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Card: Ujian --}}
+            <div class="ep-card">
+                <div class="ep-card-header">
+                    <h3 class="font-semibold text-slate-700 dark:text-slate-200">
+                        Ujian ({{ $course->exams->count() }})
+                    </h3>
+                    <a href="{{ route('admin.courses.exams.create', $course) }}" class="ep-btn-outline ep-btn-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                        Tambah Ujian
+                    </a>
+                </div>
+                <div class="ep-card-body divide-y divide-slate-100 dark:divide-navy-700">
+                    @forelse($course->exams as $exam)
+                        <div class="flex items-center gap-3 py-3 group">
+                            <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
+                                        {{ $exam->title }}
+                                    </p>
+                                    @if($exam->isActive())
+                                        <x-badge color="green" size="sm">Aktif</x-badge>
+                                    @else
+                                        <x-badge color="gray" size="sm">Tidak Aktif</x-badge>
+                                    @endif
+                                </div>
                                 <p class="text-xs text-slate-400 mt-0.5">
-                                    {{ $chapter->lessons->count() }} lessons
+                                    {{ count($exam->questions) }} soal
+                                    · {{ $exam->duration_minutes }} menit
+                                    · Lulus ≥{{ $exam->passing_score }}%
+                                    @if($exam->submissions_count ?? $exam->submissions->count())
+                                        · {{ $exam->submissions->count() }} peserta
+                                    @endif
                                 </p>
+                            </div>
+                            <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ route('admin.exams.analytics', $exam) }}"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                                    title="Analitik">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    </svg>
+                                </a>
+                                <a href="{{ route('admin.exams.edit', $exam) }}"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors"
+                                    title="Edit">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </a>
+                                <button type="button"
+                                    class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                                    onclick="EP.deleteForm(this, 'Ujian dan semua hasil siswa akan dihapus permanen.')"
+                                    data-form-id="delete-exam-{{ $exam->id }}"
+                                    title="Hapus">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     @empty
                         <div class="text-center py-8">
-                            <p class="text-sm text-slate-400">Belum ada chapter</p>
+                            <p class="text-sm text-slate-400 mb-3">Belum ada ujian untuk kursus ini</p>
+                            <a href="{{ route('admin.courses.exams.create', $course) }}"
+                               class="ep-btn-outline ep-btn-sm">
+                                + Tambah Ujian Pertama
+                            </a>
                         </div>
                     @endforelse
                 </div>
@@ -253,6 +394,22 @@
     </div>
 
 @endsection
+
+{{-- !! Form hapus lesson — WAJIB di luar form lain !! --}}
+@foreach ($course->lessons as $lesson)
+    <form id="delete-lesson-{{ $lesson->id }}" action="{{ route('admin.lessons.destroy', $lesson) }}"
+        method="POST" class="hidden">
+        @csrf @method('DELETE')
+    </form>
+@endforeach
+
+{{-- Form hapus exam --}}
+@foreach ($course->exams as $exam)
+    <form id="delete-exam-{{ $exam->id }}" action="{{ route('admin.exams.destroy', $exam) }}"
+        method="POST" class="hidden">
+        @csrf @method('DELETE')
+    </form>
+@endforeach
 
 @push('scripts')
     <script src="{{ asset('js/sweetalert.js') }}"></script>
