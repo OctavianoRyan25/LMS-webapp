@@ -7,14 +7,33 @@ use App\Http\Requests\StoreExamRequest;
 use App\Http\Requests\UpdateExamRequest;
 use App\Models\Course;
 use App\Models\Exam;
+use App\Models\ExamSubmission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 final class ExamController extends Controller
 {
-    public function index(Course $course): RedirectResponse
+    public function index(): View
     {
-        return redirect()->route('admin.courses.show', $course);
+        $exams = Exam::with(['course'])
+            ->withCount('submissions')
+            ->withCount(['submissions as passed_count' => fn($q) => $q->where('is_passed', true)])
+            ->latest()
+            ->paginate(15);
+
+        return view('page.exams.index', [
+            'activeNav' => 'exams',
+            'exams'     => $exams,
+            'stats'     => [
+                'total'       => Exam::count(),
+                'active'      => Exam::where(fn($q) => $q
+                    ->where(fn($q) => $q->whereNull('start_date')->orWhere('start_date', '<=', now()))
+                    ->where(fn($q) => $q->whereNull('end_date')->orWhere('end_date', '>=', now()))
+                )->count(),
+                'submissions' => ExamSubmission::count(),
+                'avg_score'   => round(ExamSubmission::avg('score') ?? 0, 1),
+            ],
+        ]);
     }
 
     public function create(Course $course): View

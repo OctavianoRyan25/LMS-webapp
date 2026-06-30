@@ -144,7 +144,7 @@
             <div class="ep-card">
                 <div class="ep-card-header">
                     <h3 class="font-semibold text-slate-700 dark:text-slate-200">
-                        Lessons ({{ $course->lessons->count() }})
+                        Materi ({{ $course->lessons->count() }})
                     </h3>
                     <a href="{{ route('admin.courses.lessons.create', $course) }}" class="ep-btn-outline ep-btn-sm">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -246,7 +246,7 @@
                     </h3>
                     <a href="{{ route('admin.courses.exams.create', $course) }}" class="ep-btn-outline ep-btn-sm">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
                         Tambah Ujian
                     </a>
@@ -254,10 +254,12 @@
                 <div class="ep-card-body divide-y divide-slate-100 dark:divide-navy-700">
                     @forelse($course->exams as $exam)
                         <div class="flex items-center gap-3 py-3 group">
-                            <div class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-4 h-4 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-violet-50 dark:bg-violet-500/10 flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4 text-violet-500" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -265,7 +267,7 @@
                                     <p class="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
                                         {{ $exam->title }}
                                     </p>
-                                    @if($exam->isActive())
+                                    @if ($exam->isActive())
                                         <x-badge color="green" size="sm">Aktif</x-badge>
                                     @else
                                         <x-badge color="gray" size="sm">Tidak Aktif</x-badge>
@@ -275,7 +277,7 @@
                                     {{ count($exam->questions) }} soal
                                     · {{ $exam->duration_minutes }} menit
                                     · Lulus ≥{{ $exam->passing_score }}%
-                                    @if($exam->submissions_count ?? $exam->submissions->count())
+                                    @if ($exam->submissions_count ?? $exam->submissions->count())
                                         · {{ $exam->submissions->count() }} peserta
                                     @endif
                                 </p>
@@ -286,7 +288,7 @@
                                     title="Analitik">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                     </svg>
                                 </a>
                                 <a href="{{ route('admin.exams.edit', $exam) }}"
@@ -294,17 +296,16 @@
                                     title="Edit">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                     </svg>
                                 </a>
                                 <button type="button"
                                     class="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                                     onclick="EP.deleteForm(this, 'Ujian dan semua hasil siswa akan dihapus permanen.')"
-                                    data-form-id="delete-exam-{{ $exam->id }}"
-                                    title="Hapus">
+                                    data-form-id="delete-exam-{{ $exam->id }}" title="Hapus">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                 </button>
                             </div>
@@ -313,7 +314,7 @@
                         <div class="text-center py-8">
                             <p class="text-sm text-slate-400 mb-3">Belum ada ujian untuk kursus ini</p>
                             <a href="{{ route('admin.courses.exams.create', $course) }}"
-                               class="ep-btn-outline ep-btn-sm">
+                                class="ep-btn-outline ep-btn-sm">
                                 + Tambah Ujian Pertama
                             </a>
                         </div>
@@ -405,8 +406,8 @@
 
 {{-- Form hapus exam --}}
 @foreach ($course->exams as $exam)
-    <form id="delete-exam-{{ $exam->id }}" action="{{ route('admin.exams.destroy', $exam) }}"
-        method="POST" class="hidden">
+    <form id="delete-exam-{{ $exam->id }}" action="{{ route('admin.exams.destroy', $exam) }}" method="POST"
+        class="hidden">
         @csrf @method('DELETE')
     </form>
 @endforeach

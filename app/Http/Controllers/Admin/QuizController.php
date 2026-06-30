@@ -7,14 +7,30 @@ use App\Http\Requests\StoreQuizRequest;
 use App\Http\Requests\UpdateQuizRequest;
 use App\Models\Lesson;
 use App\Models\Quiz;
+use App\Models\QuizSubmission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 final class QuizController extends Controller
 {
-    public function index(Lesson $lesson): RedirectResponse
+    public function index(): View
     {
-        return redirect()->route('admin.lessons.edit', $lesson);
+        $quizzes = Quiz::with(['lesson.course'])
+            ->withCount('submissions')
+            ->withCount(['submissions as passed_count' => fn($q) => $q->where('is_passed', true)])
+            ->latest()
+            ->paginate(15);
+
+        return view('page.quizzes.index', [
+            'activeNav' => 'quizzes',
+            'quizzes'   => $quizzes,
+            'stats'     => [
+                'total'       => Quiz::count(),
+                'submissions' => QuizSubmission::count(),
+                'passed'      => QuizSubmission::where('is_passed', true)->count(),
+                'avg_score'   => round(QuizSubmission::avg('score') ?? 0, 1),
+            ],
+        ]);
     }
 
     public function create(Lesson $lesson): View

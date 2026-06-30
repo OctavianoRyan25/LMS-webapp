@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\LessonController;
+use App\Http\Controllers\Admin\NotificationController;
 use App\Http\Controllers\Admin\QuizController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -25,6 +26,9 @@ Route::redirect('/', '/admin/dashboard');
 Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (): void {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/quizzes/all',     [QuizController::class,       'index'])->name('quizzes.index');
+    Route::get('/assignments/all', [AssignmentController::class, 'index'])->name('assignments.index');
+    Route::get('/exams/all',       [ExamController::class,       'index'])->name('exams.index');
 
     // ── Course ────────────────────────────────────────────────────────────────
     Route::resource('courses', CourseController::class);
@@ -56,5 +60,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function (): v
 
     // ── Misc ──────────────────────────────────────────────────────────────────
     Route::get('/settings', fn() => view('page.settings', ['activeNav' => 'settings']))->name('settings');
-    Route::get('/notifications', fn() => view('page.notifications', ['activeNav' => 'notifications']))->name('notifications');
+
+    // ── Notifications ─────────────────────────────────────────────────────────
+    Route::get('/notifications',                                [NotificationController::class, 'index'])->name('notifications');
+    Route::post('/notifications/{id}/read',                     [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all',                      [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{id}',                        [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::post('/notifications/clear-read',                    [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
 });

@@ -26,7 +26,7 @@
 |       create-route="{{ route('admin.students.create') }}"
 |       create-label="Tambah Siswa"
 |   >
-|       @foreach($students as $student)
+|       @foreach ($students as $student)
 |           <tr>
 |               <td>...</td>
 |           </tr>
@@ -35,43 +35,40 @@
 --}}
 
 @props([
-    'id'          => 'ep-table',
-    'columns'     => [],
-    'searchable'  => true,
+    'id' => 'ep-table',
+    'columns' => [],
+    'searchable' => true,
     'createRoute' => null,
     'createLabel' => 'Tambah',
-    'emptyText'   => 'Belum ada data.',
+    'emptyText' => 'Belum ada data.',
 ])
 
-<div class="ep-card overflow-hidden"
-     x-data="{
-         search: '',
-         sortKey: '',
-         sortDir: 'asc',
-         setSort(key) {
-             if (this.sortKey === key) {
-                 this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
-             } else {
-                 this.sortKey = key;
-                 this.sortDir = 'asc';
-             }
-         }
-     }">
+<div class="ep-card overflow-hidden" x-data="{
+    search: '',
+    sortKey: '',
+    sortDir: 'asc',
+    setSort(key) {
+        if (this.sortKey === key) {
+            this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            this.sortKey = key;
+            this.sortDir = 'asc';
+        }
+    }
+}">
 
     {{-- Toolbar --}}
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4
+    <div
+        class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-5 py-4
                 border-b border-slate-100 dark:border-navy-700">
 
-        @if($searchable)
+        @if ($searchable)
             <div class="relative w-full sm:w-64">
-                <input type="text"
-                       x-model="search"
-                       placeholder="Cari data..."
-                       class="ep-input !py-2 pl-9">
+                <input type="text" x-model="search" placeholder="Cari data..." class="ep-input !py-2 !pl-9 pr-4">
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
                 </svg>
             </div>
         @else
@@ -82,10 +79,10 @@
             {{-- Slot untuk tombol tambahan --}}
             {{ $toolbar ?? '' }}
 
-            @if($createRoute)
+            @if ($createRoute)
                 <a href="{{ $createRoute }}" class="ep-btn-primary">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     {{ $createLabel }}
                 </a>
@@ -98,21 +95,29 @@
         <table class="w-full ep-table" id="{{ $id }}">
             <thead>
                 <tr>
-                    @foreach($columns as $col)
+                    @foreach ($columns as $col)
                         <th>
-                            @if(($col['sortable'] ?? false))
+                            @if ($col['sortable'] ?? false)
                                 <button @click="setSort('{{ $col['key'] }}')"
-                                        class="flex items-center gap-1 group hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+                                    class="flex items-center gap-1 group hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
                                     {{ $col['label'] }}
                                     <span class="opacity-40 group-hover:opacity-100 transition-opacity">
-                                        <svg x-show="sortKey !== '{{ $col['key'] }}'" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                                        <svg x-show="sortKey !== '{{ $col['key'] }}'" class="w-3.5 h-3.5"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                         </svg>
-                                        <svg x-show="sortKey === '{{ $col['key'] }}' && sortDir === 'asc'" x-cloak class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                                        <svg x-show="sortKey === '{{ $col['key'] }}' && sortDir === 'asc'" x-cloak
+                                            class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 15l7-7 7 7" />
                                         </svg>
-                                        <svg x-show="sortKey === '{{ $col['key'] }}' && sortDir === 'desc'" x-cloak class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        <svg x-show="sortKey === '{{ $col['key'] }}' && sortDir === 'desc'" x-cloak
+                                            class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </span>
                                 </button>

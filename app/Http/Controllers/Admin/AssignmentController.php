@@ -8,16 +8,32 @@ use App\Http\Requests\UpdateAssignmentRequest;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
 use App\Models\Lesson;
+use App\Notifications\AssignmentGraded;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 final class AssignmentController extends Controller
 {
-    public function index(Lesson $lesson): RedirectResponse
+    public function index(): View
     {
-        return redirect()->route('admin.lessons.edit', $lesson);
-    }
+       $assignments = Assignment::with(['lesson.course'])
+           ->withCount('submissions')
+           ->withCount(['submissions as graded_count' => fn($q) => $q->whereNotNull('score')])
+           ->latest()
+           ->paginate(15);
+
+       return view('page.assignments.index', [
+           'activeNav'   => 'assignments',
+           'assignments' => $assignments,
+           'stats' => [
+               'total'   => Assignment::count(),
+               'graded'  => AssignmentSubmission::whereNotNull('score')->count(),
+               'pending' => AssignmentSubmission::whereNull('score')->count(),
+               'avg'     => round(AssignmentSubmission::whereNotNull('score')->avg('score') ?? 0, 1),
+           ],
+       ]);
+   }
 
     public function create(Lesson $lesson): View
     {
@@ -95,11 +111,18 @@ final class AssignmentController extends Controller
             'feedback' => ['nullable', 'string', 'max:1000'],
         ]);
 
+        $wasUngraded = is_null($submission->score);
+
         $submission->update([
             'score'     => $request->score,
             'feedback'  => $request->feedback,
             'graded_at' => now(),
         ]);
+
+        // Kirim notifikasi ke siswa hanya sekali (saat pertama dinilai)
+        if ($wasUngraded && $submission->user) {
+            $submission->user->notify(new AssignmentGraded($submission->load('assignment')));
+        }
 
         return back()->with('success', "Nilai untuk {$submission->user->name} berhasil disimpan!");
     }

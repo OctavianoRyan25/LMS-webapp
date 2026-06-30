@@ -70,7 +70,19 @@
             </svg>
         </button>
 
-        {{-- Notifications --}}
+        {{-- ── Notification Bell ─────────────────────────────────────────────────── --}}
+        @php
+            $unreadCount  = auth()->user()->unreadNotifications()->count();
+            $recentNotifs = auth()->user()->notifications()->latest()->take(5)->get();
+            $topbarTypeIcons = [
+                'assignment_graded'   => '📝',
+                'quiz_completed'      => '🎯',
+                'exam_completed'      => '📋',
+                'exam_available'      => '🗒️',
+                'new_lesson'          => '📚',
+                'assignment_due_soon' => '⏰',
+            ];
+        @endphp
         <div class="relative" x-data="notifDropdown()">
             <button @click="open = !open"
                     class="relative p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-navy-800 transition-all"
@@ -79,12 +91,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                 </svg>
-                @php $unreadCount = 3; /* ganti dengan: auth()->user()->unreadNotifications->count() */ @endphp
                 @if($unreadCount > 0)
                     <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full pulse-dot"></span>
                 @endif
             </button>
 
+            {{-- Dropdown panel --}}
             <div x-show="open" x-cloak
                  @click.outside="open = false"
                  x-transition:enter="transition ease-out duration-150"
@@ -95,36 +107,67 @@
                  x-transition:leave-end="opacity-0 translate-y-1"
                  class="absolute right-0 mt-2 w-80 card-bg border border-slate-200 dark:border-navy-700 rounded-2xl shadow-xl overflow-hidden z-50">
 
+                {{-- Panel header --}}
                 <div class="px-4 py-3 border-b border-slate-100 dark:border-navy-700 flex justify-between items-center">
-                    <p class="font-semibold text-sm">Notifikasi</p>
-                    <span class="text-xs bg-brand-50 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400 px-2 py-0.5 rounded-full font-semibold">
-                        {{ $unreadCount }} baru
-                    </span>
+                    <p class="font-semibold text-sm text-slate-800 dark:text-white">Notifikasi</p>
+                    <div class="flex items-center gap-3">
+                        @if($unreadCount > 0)
+                            <span class="text-xs bg-red-50 dark:bg-red-500/20 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full font-semibold">
+                                {{ $unreadCount }} baru
+                            </span>
+                            <form action="{{ route('admin.notifications.read-all') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-xs text-brand-500 hover:text-brand-600 transition-colors font-medium">
+                                    Baca semua
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
 
+                {{-- Notification items --}}
                 <div class="divide-y divide-slate-100 dark:divide-navy-700 max-h-72 overflow-y-auto">
-                    {{-- Ganti dengan: @foreach(auth()->user()->notifications->take(5) as $notif) --}}
-                    @php
-                        $demoNotifs = [
-                            ['icon' => '👥', 'title' => '12 siswa baru mendaftar hari ini', 'time' => '5 menit lalu', 'unread' => true],
-                            ['icon' => '📚', 'title' => 'Kursus "React Native" menunggu review', 'time' => '1 jam lalu', 'unread' => true],
-                            ['icon' => '🏆', 'title' => '89 sertifikat diterbitkan bulan ini', 'time' => '3 jam lalu', 'unread' => false],
-                        ];
-                    @endphp
-                    @foreach($demoNotifs as $notif)
-                        <div class="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-navy-800 transition-colors cursor-pointer">
-                            <span class="text-xl flex-shrink-0 mt-0.5">{{ $notif['icon'] }}</span>
+                    @forelse($recentNotifs as $notif)
+                        @php
+                            $nd       = $notif->data;
+                            $isUnread = is_null($notif->read_at);
+                            $nIcon    = $topbarTypeIcons[$nd['type'] ?? ''] ?? '🔔';
+                        @endphp
+                        <div class="flex items-start gap-3 px-4 py-3 transition-colors
+                                    {{ $isUnread
+                                        ? 'bg-brand-50/50 dark:bg-brand-500/5 hover:bg-brand-50 dark:hover:bg-brand-500/10'
+                                        : 'hover:bg-slate-50 dark:hover:bg-navy-800' }}">
+                            <span class="text-lg flex-shrink-0 mt-0.5">{{ $nIcon }}</span>
                             <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-slate-700 dark:text-slate-200 leading-snug">{{ $notif['title'] }}</p>
-                                <p class="text-xs text-slate-400 mt-0.5">{{ $notif['time'] }}</p>
+                                <p class="text-sm font-medium text-slate-700 dark:text-slate-200 leading-snug">
+                                    {{ $nd['title'] ?? 'Notifikasi' }}
+                                </p>
+                                <p class="text-xs text-slate-400 mt-0.5 line-clamp-2">{{ $nd['body'] ?? '' }}</p>
+                                <p class="text-xs text-slate-400 mt-1">{{ $notif->created_at->diffForHumans() }}</p>
                             </div>
-                            @if($notif['unread'])
-                                <span class="w-2 h-2 bg-brand-500 rounded-full mt-1.5 flex-shrink-0"></span>
-                            @endif
+                            <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                                @if($isUnread)
+                                    <span class="w-2 h-2 bg-brand-500 rounded-full"></span>
+                                    <form action="{{ route('admin.notifications.read', $notif->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" title="Tandai dibaca"
+                                            class="text-xs text-slate-400 hover:text-brand-500 transition-colors">✓</button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
-                    @endforeach
+                    @empty
+                        <div class="py-10 text-center text-slate-400">
+                            <svg class="w-8 h-8 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <p class="text-sm">Belum ada notifikasi</p>
+                        </div>
+                    @endforelse
                 </div>
 
+                {{-- Panel footer --}}
                 <div class="px-4 py-2.5 text-center border-t border-slate-100 dark:border-navy-700">
                     <a href="{{ route('admin.notifications') }}"
                        class="text-sm text-brand-500 hover:text-brand-600 font-medium transition-colors">
